@@ -1,12 +1,12 @@
-from unittest import TestCase
-
 import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 from statsmodels.regression.linear_model import WLS
 from statsmodels.regression._tools import _MinimalWLS
 
-class TestMinimalWLS(TestCase):
+
+class TestMinimalWLS(object):
     @classmethod
     def setup_class(cls):
         rs = np.random.RandomState(1234)
@@ -29,11 +29,30 @@ class TestMinimalWLS(TestCase):
         assert_allclose(res.resid, minres.resid)
 
         res = WLS(self.endog1, self.exog1, weights=self.weights1).fit()
-        minres = _MinimalWLS(self.endog1, self.exog1, weights=self.weights1).fit()
+        minres = _MinimalWLS(self.endog1, self.exog1,
+                             weights=self.weights1).fit()
         assert_allclose(res.params, minres.params)
         assert_allclose(res.resid, minres.resid)
 
         res = WLS(self.endog2, self.exog2, weights=self.weights2).fit()
-        minres = _MinimalWLS(self.endog2, self.exog2, weights=self.weights2).fit()
+        minres = _MinimalWLS(self.endog2, self.exog2,
+                             weights=self.weights2).fit()
         assert_allclose(res.params, minres.params)
         assert_allclose(res.resid, minres.resid)
+
+    @pytest.mark.parametrize('bad_value', [np.nan, np.inf])
+    def test_inf_nan(self, bad_value):
+        with pytest.raises(ValueError) as err:
+            endog = self.endog1.copy()
+            endog[0] = bad_value
+            _MinimalWLS(endog, self.exog1, check_finite=True).fit()
+        assert err.type is ValueError
+        assert 'endog' in str(err)
+
+        with pytest.raises(ValueError) as err:
+            weights = self.weights1.copy()
+            weights[-1] = bad_value
+            _MinimalWLS(self.endog1, self.exog1, weights=weights,
+                        check_finite=True).fit()
+        assert err.type is ValueError
+        assert 'weights' in str(err)

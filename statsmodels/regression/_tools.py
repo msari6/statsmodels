@@ -1,8 +1,5 @@
-from collections import namedtuple
 import numpy as np
 from statsmodels.tools.tools import Bunch
-
-_MinimalWLSModel = namedtuple('_MinimalWLSModel', ['weights'])
 
 
 class _MinimalWLS(object):
@@ -22,10 +19,13 @@ class _MinimalWLS(object):
         1d array of weights.  If you supply 1/W then the variables are pre-
         multiplied by 1/sqrt(W).  If no weights are supplied the default value
         is 1 and WLS reults are the same as OLS.
+    check_finite : bool, optional
+        Flag indicating whether to check for inf/nan in endog and weights.
+        If True and any are found, ValueError is raised.
 
     Notes
     -----
-    Need resid, scale, fittedvalues, model.weights!
+    Need resid, scale, fittedvalues, model.weights
         history['scale'].append(tmp_results.scale)
         if conv == 'dev':
             history['deviance'].append(self.deviance(tmp_results))
@@ -33,13 +33,20 @@ class _MinimalWLS(object):
             history['sresid'].append(tmp_results.resid/tmp_results.scale)
         elif conv == 'weights':
             history['weights'].append(tmp_results.model.weights)
-    Does not perform and checks on the input data
+    Does not perform any checks on the input data
     """
 
-    def __init__(self, endog, exog, weights=1.0):
+    def __init__(self, endog, exog, weights=1.0, check_finite=False):
         self.endog = endog
         self.exog = exog
         self.weights = weights
+        if check_finite:
+            msg = 'NaN/inf detected in {0}, estimation infeasible.'
+            if not np.all(np.isfinite(endog)):
+                raise ValueError(msg.format('endog'))
+            if not np.all(np.isfinite(weights)):
+                raise ValueError(msg.format('weights'))
+
         w_half = np.sqrt(weights)
 
         self.wendog = w_half * endog
