@@ -277,7 +277,7 @@ class RLM(base.LikelihoodModel):
             self.weights = self.M.weights(wls_results.resid/self.scale)
             wls_results = reg_tools._MinimalWLS(self.endog, self.exog,
                                                 weights=self.weights,
-                                                check_finite=True).fit()
+                                                check_weights=True).fit()
             if update_scale is True:
                 self.scale = self._estimate_scale(wls_results.resid)
             history = self._update_history(wls_results, history, conv)
