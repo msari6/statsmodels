@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 
+GLOBAL_STATE = np.random.get_state()
+
 try:
     import matplotlib
 
@@ -107,3 +109,12 @@ def reset_randomstate():
     np.random.seed(1)
     yield
     np.random.set_state(state)
+
+
+@pytest.fixture(scope='function', autouse=True)
+def check_randomstate():
+    state = np.random.get_state()
+    yield
+    curr_state = np.random.get_state()
+    assert np.all(state[1]==curr_state[1])
+    assert state[2] == curr_state[2]

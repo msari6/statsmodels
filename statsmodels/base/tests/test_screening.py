@@ -30,7 +30,6 @@ class GLMPenalized(PenalizedMixin, GLM):
 
 
 def _get_poisson_data():
-    np.random.seed(987865)
 
     nobs, k_vars = 100, 500
     k_nonzero = 5
@@ -50,9 +49,7 @@ def _get_poisson_data():
     return y, x, idx_nonzero_true, beta
 
 
-def test_poisson_screening():
-
-    np.random.seed(987865)
+def test_poisson_screening(reset_randomstate):
 
     y, x, idx_nonzero_true, beta = _get_poisson_data()
     nobs = len(y)
@@ -88,9 +85,7 @@ def test_poisson_screening():
     assert_allclose(parameters['oracle'], parameters['final'], atol=5e-6)
 
 
-def test_screen_iterated():
-    np.random.seed(987865)
-
+def test_screen_iterated(reset_randomstate):
     nobs, k_nonzero = 100, 5
 
     x = (np.random.rand(nobs, k_nonzero - 1) +
@@ -141,7 +136,7 @@ def test_screen_iterated():
         assert_equal(final.idx_nonzero_batches, idx_full)
 
 
-def test_glmpoisson_screening():
+def test_glmpoisson_screening(reset_randomstate):
 
     y, x, idx_nonzero_true, beta = _get_poisson_data()
     nobs = len(y)
@@ -197,7 +192,7 @@ def _get_logit_data():
     return y, x, idx_nonzero_true, beta
 
 
-def test_logit_screening():
+def test_logit_screening(reset_randomstate):
 
     y, x, idx_nonzero_true, beta = _get_logit_data()
     nobs = len(y)
@@ -242,7 +237,7 @@ def test_logit_screening():
     assert_allclose(parameters['oracle'], parameters['final'], atol=0.005)
 
 
-def test_glmlogit_screening():
+def test_glmlogit_screening(reset_randomstate):
 
     y, x, idx_nonzero_true, beta = _get_logit_data()
     nobs = len(y)
@@ -289,7 +284,6 @@ def test_glmlogit_screening():
 
 
 def _get_gaussian_data():
-    np.random.seed(987865)
 
     nobs, k_vars = 100, 500
     k_nonzero = 5
@@ -309,7 +303,7 @@ def _get_gaussian_data():
     return y, x, idx_nonzero_true, beta
 
 
-def test_glmgaussian_screening():
+def test_glmgaussian_screening(reset_randomstate):
 
     y, x, idx_nonzero_true, beta = _get_gaussian_data()
     nobs = len(y)

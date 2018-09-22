@@ -40,7 +40,7 @@ class RemoveDataPickle(object):
         cls.l_max = 20000
         cls.predict_kwds = {}
 
-    def test_remove_data_pickle(self):
+    def test_remove_data_pickle(self, reset_randomstate):
         import pandas as pd
         from pandas.util.testing import assert_series_equal
 
@@ -91,10 +91,10 @@ class RemoveDataPickle(object):
         else:
             np.testing.assert_equal(pred3, pred1)
 
-    def test_remove_data_docstring(self):
+    def test_remove_data_docstring(self, reset_randomstate):
         assert_(self.results.remove_data.__doc__ is not None)
 
-    def test_pickle_wrapper(self):
+    def test_pickle_wrapper(self, reset_randomstate):
 
         fh = BytesIO()  # use cPickle with binary content
 
